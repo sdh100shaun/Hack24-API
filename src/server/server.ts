@@ -1,5 +1,3 @@
-"use strict";
-
 import * as respond from './routes/respond';
 import * as express from 'express';
 import * as mongoose from 'mongoose';
@@ -10,15 +8,17 @@ import {Server as HttpServer} from 'http';
 import {UsersRoute} from './routes/users';
 import {TeamsRoute} from './routes/teams';
 import {HacksRoute} from './routes/hacks';
+import {ChallengesRoute} from './routes/challenges';
 import {AttendeesRoute} from './routes/attendees';
 import {TeamMembersRoute} from './routes/team.members';
 import {TeamEntriesRoute} from './routes/team.entries';
+import {HackChallengesRoute} from './routes/hack.challenges';
 import {ExpressLogger} from './logger';
 import {EventBroadcaster} from './eventbroadcaster';
 
 export interface ServerInfo {
-  IP: string
-  Port: number
+  IP: string;
+  Port: number;
 }
 
 export class Server {
@@ -27,16 +27,18 @@ export class Server {
 
   constructor() {
     const eventBroadcaster = new EventBroadcaster();
-    
+
     const usersRouter = new UsersRoute(eventBroadcaster).createRouter();
     const teamsRouter = new TeamsRoute(eventBroadcaster).createRouter();
     const teamMembersRouter = new TeamMembersRoute(eventBroadcaster).createRouter();
     const teamEntriesRouter = new TeamEntriesRoute(eventBroadcaster).createRouter();
     const hacksRouter = new HacksRoute(eventBroadcaster).createRouter();
+    const hackChallengesRouter = new HackChallengesRoute(eventBroadcaster).createRouter();
+    const challengesRouter = new ChallengesRoute(eventBroadcaster).createRouter();
     const attendeesRouter = new AttendeesRoute(eventBroadcaster).createRouter();
 
     this._app = express();
-    
+
     this._app.use(ExpressLogger);
 
     this._app.use('/attendees', attendeesRouter);
@@ -45,37 +47,41 @@ export class Server {
     this._app.use('/teams', teamEntriesRouter);
     this._app.use('/teams', teamsRouter);
     this._app.use('/hacks', hacksRouter);
+    this._app.use('/hacks', hackChallengesRouter);
+    this._app.use('/challenges', challengesRouter);
 
     this._app.get('/api', (_, res) => res.send('Hack24 API is running'));
-    
+
     this._app.get('/', middleware.allowAllOriginsWithGetAndHeaders, Root.Get);
     this._app.options('/', middleware.allowAllOriginsWithGetAndHeaders, (_, res) => respond.Send204(res));
   }
 
-  listen(): Promise<ServerInfo> {
+  public listen(): Promise<ServerInfo> {
     return new Promise<ServerInfo>((resolve, reject) => {
-      mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/hack24db');
-      
-      var db = mongoose.connection;
+      mongoose.connect(process.env.MONGODB_URL || process.env.MONGODB_URI || 'mongodb://localhost/hack24db');
+
+      let db = mongoose.connection;
       db.on('error', (err) => {
         db.removeAllListeners('open');
         err.message = `Unable to connect to MongoDB - ${err.message}`;
         reject(err);
       });
-      
+
       db.once('open', () => {
         const port = process.env.PORT || 5000;
 
         this._server = this._app.listen(port, function(err) {
-          if (err) return reject(err);
+          if (err) {
+            return reject(err);
+          }
           resolve({ IP: '0.0.0.0', Port: port });
         });
       });
-      
+
     });
   }
-  
-  close(): Promise<void> {
+
+  public close(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this._server.close(() => {
         resolve();

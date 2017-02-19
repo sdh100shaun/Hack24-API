@@ -1,5 +1,3 @@
-"use strict";
-
 export class Random {
   /**
    * Generates a random number between min and max.
@@ -9,10 +7,10 @@ export class Random {
    */
   public static num (min?: number, max?: number): number {
     const _min = min || 0;
-    const _max = max || Number.MAX_VALUE - 1
+    const _max = max || Number.MAX_VALUE - 1;
     return Math.random() * (_max - _min + 1) + _min;
   }
-  
+
   /**
    * Generates a random integer between min and max.
    * @param min The minimum integer to generate.
@@ -24,7 +22,7 @@ export class Random {
     const _max = max || 4294967296;
     return Math.floor(this.num(_min, _max));
   }
-  
+
   /**
    * Generates a random single-character string between min and max.
    * @param min The minimum character to use when generating. Default 'a'.
@@ -37,7 +35,7 @@ export class Random {
     const n = this.int(_min.charCodeAt(0), _max.charCodeAt(0));
     return String.fromCharCode(n);
   }
-  
+
   /**
    * Generates a random string with length between min and max.
    * @param length The length of the string to generate. Default 50.
@@ -46,11 +44,10 @@ export class Random {
    * @returns The random string.
    */
   public static str (length?: number, min?: string, max?: string) {
-    const _length = length || 50;
     let result = "";
     for (let i = 0; i < length; i++) {
       result += this.char(min, max);
-    };
+    }
     return result;
   }
 }
