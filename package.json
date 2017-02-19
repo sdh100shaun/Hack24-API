@@ -25,6 +25,7 @@
     "pusher": "^1.5.0",
     "slug": "^0.9.1",
     "source-map-support": "^0.4.2",
+    "rimraf":"^2.5.4",
     "typescript": "^2.0.3",
     "winston": "^2.2.0"
   },
