@@ -12,7 +12,7 @@
     "build": "tsc -p src/",
     "start": "node bin/server.js",
     "test": "mocha --timeout 5000 -R dot --require source-map-support/register --recursive build",
-    "heroku-postbuild": "npm run build && npm prune"
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
