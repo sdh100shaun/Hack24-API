@@ -135,3 +135,13 @@ export function AsyncHandler(fn: (req: Request, res: Response, next: NextFunctio
     })
   }
 }
+
+export function HasFilter(req: Request & UnauthorisedRequest, res: Response, next: Function) {
+  const query = req.query
+  const hasFilter = query.hasOwnProperty('filter') || query.filter !== undefined
+  if ( query.length === 0 || hasFilter === false ) {
+    return next()
+  }
+  res.locals.filter = true
+  return next()
+}

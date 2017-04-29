@@ -19,7 +19,7 @@ export class UsersRoute {
     const asyncHandler = middleware.AsyncHandler.bind(this)
     const router = Router()
 
-    router.get('/', middleware.allowAllOriginsWithGetAndHeaders, asyncHandler(this.getAll))
+    router.get('/', middleware.HasFilter, middleware.allowAllOriginsWithGetAndHeaders, asyncHandler(this.getAll))
     router.options('/', middleware.allowAllOriginsWithGetAndHeaders, (_, res) => respond.Send204(res))
     router.post('/', middleware.requiresUser, middleware.requiresAttendeeUser, JsonApiParser, asyncHandler(this.create))
     router.get('/:userId', middleware.allowAllOriginsWithGetAndHeaders, asyncHandler(this.get))
@@ -29,18 +29,23 @@ export class UsersRoute {
   }
 
   public async getAll(_: Request, res: Response) {
+
     const users = await UserModel
       .find({}, 'userid name')
       .sort({ userid: 1 })
       .exec()
-
     const userObjectIds = users.map((user) => user._id)
 
     const teams = await TeamModel
       .find({ members: { $in: userObjectIds } }, 'teamid name motto members')
       .populate('members', 'userid')
       .exec()
-
+    if ( _.query.hasOwnProperty('filter') ) {
+      const filters = _.query.filter
+      for ( var filter in filters ) {
+        
+      }
+    }
     const userResponses = users.map((user) => {
       const usersTeam = teams.find((team) => team.members.some((member) => member.userid === user.userid))
       const userResponse: UserResource.ResourceObject = {
