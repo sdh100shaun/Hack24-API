@@ -26,15 +26,8 @@
     "morgan": "^1.8.1",
     "pusher": "^1.5.1",
     "slug": "^0.9.1",
-<<<<<<< HEAD
-    "source-map-support": "^0.4.2",
-    "rimraf":"^2.5.4",
-    "typescript": "^2.0.3",
-    "winston": "^2.2.0"
-=======
     "source-map-support": "^0.4.11",
     "winston": "^2.3.1"
->>>>>>> upstream/master
   },
   "devDependencies": {
     "@types/body-parser": "0.0.34",
